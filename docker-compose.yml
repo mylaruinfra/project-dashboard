@@ -1,0 +1,64 @@
+# Local development:   docker compose up -d db          (Postgres on host port 55432 + sitebook_test DB)
+# Full stack (server): docker compose --profile app up -d --build
+#   - "migrate" runs drizzle migrations, then "app" starts on port 3000
+#   - one-off tasks:   docker compose --profile app run --rm tools npm run user:create -- --email … --password …
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sitebook
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sitebook}
+      POSTGRES_DB: sitebook
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/10-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sitebook -d sitebook"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  tools:
+    profiles: ["app"]
+    build: { context: ., target: tools }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://sitebook:${POSTGRES_PASSWORD:-sitebook}@db:5432/sitebook
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db: { condition: service_healthy }
+    command: ["true"]
+
+  migrate:
+    profiles: ["app"]
+    build: { context: ., target: tools }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://sitebook:${POSTGRES_PASSWORD:-sitebook}@db:5432/sitebook
+    depends_on:
+      db: { condition: service_healthy }
+    command: ["npm", "run", "db:migrate"]
+
+  app:
+    profiles: ["app"]
+    build: { context: ., target: runner }
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://sitebook:${POSTGRES_PASSWORD:-sitebook}@db:5432/sitebook
+      UPLOAD_DIR: /data/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:
+  uploads:

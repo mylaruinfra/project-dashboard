@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+/*
+ * SiteBook design tokens — the only place colours live (see DESIGN.md).
+ * Component specs in DESIGN.md use the "drafting" palette below; the M3 front-matter roles
+ * map onto it (error roles come from the front matter).
+ */
+@theme {
+  /* reset defaults we do not want */
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* drafting palette */
+  --color-canvas: #f4f3ef; /* Drafting canvas ground */
+  --color-paper: #ffffff; /* Surface crisp white */
+  --color-ink: #121517; /* Charcoal slate-black */
+  --color-hairline: #d5d2ca; /* Structural hairline gray */
+  --color-hazard: #f05a24; /* Industrial safety cadmium */
+  --color-hazard-deep: #d0440b; /* primary-container */
+  --color-hazard-tint: #ffdbd0; /* primary-fixed */
+  --color-indigo: #1b2a47; /* Drafting cadet indigo */
+  --color-indigo-tint: #d8e2ff; /* secondary-fixed */
+  --color-steel: #686e74; /* Muted steel gray */
+  --color-surface-low: #f2f4f6; /* surface-container-low */
+  --color-error: #ba1a1a;
+  --color-error-tint: #ffdad6;
+  --color-on-error-tint: #93000a;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-scrim: rgb(18 21 23 / 0.55);
+
+  /* type */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* radii: strictly sharp; "dot" is reserved for status dots and gauges */
+  --radius-none: 0px;
+  --radius-dot: 9999px;
+
+  /* the one permitted shadow: hard, unblurred offset for popovers and modals */
+  --shadow-hard: 4px 4px 0px 0px #121517;
+  --shadow-hard-sm: 2px 2px 0px 0px #121517;
+
+  /* spacing tokens from DESIGN.md (prefixed "space-" so they never shadow max-w-sm/md/lg) */
+  --spacing-gutter: 1rem;
+  --spacing-gutter-desktop: 1.5rem;
+  --spacing-margin: 1rem;
+  --spacing-margin-desktop: 2rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2rem;
+  --spacing-touch: 2.75rem; /* 44px touch target */
+
+  --breakpoint-md: 48rem; /* 768px field tablet */
+  --breakpoint-lg: 64rem; /* 1024px office desktop */
+}
+
+/* typography scale (DESIGN.md typography tokens) */
+@utility headline-xl {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 2.25rem;
+  letter-spacing: -0.02em;
+  @media (width >= 64rem) {
+    font-size: 3rem;
+    line-height: 3.25rem;
+    letter-spacing: -0.03em;
+  }
+}
+@utility headline-lg {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  letter-spacing: -0.01em;
+  @media (width >= 64rem) {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.02em;
+  }
+}
+@utility headline-md {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  letter-spacing: -0.01em;
+}
+@utility headline-sm {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.375rem;
+}
+@utility body-lg {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+@utility body-md {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+@utility body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.01em;
+}
+@utility label-numeric {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+@utility label-technical {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 0.875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+@utility label-code {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 4px exterior crosshair ticks at the corners of a schedule (DESIGN.md "crosshair anchor marks") */
+@utility crosshairs {
+  position: relative;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    pointer-events: none;
+    background:
+      linear-gradient(var(--color-steel), var(--color-steel)) center / 1px 100% no-repeat,
+      linear-gradient(var(--color-steel), var(--color-steel)) center / 100% 1px no-repeat;
+    opacity: 0.6;
+  }
+  &::before {
+    top: -5px;
+    left: -5px;
+  }
+  &::after {
+    bottom: -5px;
+    right: -5px;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--color-hazard);
+    color: var(--color-white);
+  }
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-hairline);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-hazard);
+    outline-offset: 1px;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    border-radius: 0;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  dialog::backdrop {
+    background: var(--color-scrim);
+  }
+}
